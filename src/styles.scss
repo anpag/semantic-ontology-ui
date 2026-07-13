@@ -1,21 +1,22 @@
-@import '@angular/material/prebuilt-themes/azure-blue.css';
-
 /* 
- * Global Enterprise Light Theme Variables 
+ * Ultra-Professional Minimalist Light Theme 
+ * Inspired by high-end developer tools (Linear, Vercel)
  */
 :root {
-  --bg-color: #f4f6f8; /* Crisp light gray background */
-  --surface-color: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --accent-blue: #0ea5e9;
-  --accent-orange: #f97316;
-  --border-color: #e2e8f0;
+  --bg-color: #ffffff;
+  --surface-color: #fcfcfc;
+  --sidebar-bg: #f9f9f9;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --accent-primary: #2563eb; /* Sophisticated deep royal blue */
+  --accent-muted: #e0e7ff;
+  --border-color: #f3f4f6;
+  --border-color-dark: #e5e7eb;
   
-  --font-family: 'Inter', 'Roboto', sans-serif;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --font-family: 'Inter', sans-serif;
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-floating: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
 html, body {
@@ -25,21 +26,48 @@ html, body {
   font-family: var(--font-family);
   background-color: var(--bg-color);
   color: var(--text-primary);
+  font-size: 14px; /* Slightly smaller for professional data density */
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
 }
 
-/* Typography Overrides */
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 0;
-  font-weight: 600;
+  margin: 0;
+  font-weight: 500; /* Less aggressive bolding */
   color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Typography Overrides */
+.text-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  font-weight: 600;
 }
 
 a {
-  color: var(--accent-blue);
+  color: var(--accent-primary);
   text-decoration: none;
+}
+
+/* Custom Scrollbar for professional feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }

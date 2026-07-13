@@ -1,43 +1,98 @@
 <div class="dashboard-header">
-  <h1>Ontology Overview</h1>
-  <button class="btn-primary">New Ontology</button>
+  <div class="title-group">
+    <div class="breadcrumb text-label">Ontologies / GEB Engine</div>
+    <h1>Architecture Graph</h1>
+  </div>
+  <div class="actions">
+    <button class="btn-secondary">Import TTL</button>
+    <button class="btn-primary">New Class</button>
+  </div>
 </div>
 
 <div class="dashboard-grid">
-  <!-- Stats Panel -->
-  <div class="panel col-span-2">
-    <h3>My Ontologies</h3>
-    <div class="stats-list">
-      <div class="stat-item">
-        <span>Project Ontology</span>
-        <div class="progress-bar"><div class="fill" style="width: 70%"></div></div>
+  <!-- Interactive Graph Area (Main Focus) -->
+  <div class="panel col-span-3 graph-panel">
+    <div class="panel-header">
+      <div class="tabs">
+        <div class="tab active">Visual Editor</div>
+        <div class="tab">Turtle Source</div>
+        <div class="tab">Inferences</div>
       </div>
-      <div class="stat-item">
-        <span>Semantic Web Project</span>
-        <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+      <div class="tools">
+        <span class="material-icons-outlined">zoom_in</span>
+        <span class="material-icons-outlined">zoom_out</span>
+        <span class="material-icons-outlined">fit_screen</span>
       </div>
-      <div class="stat-item">
-        <span>Organization</span>
-        <div class="progress-bar"><div class="fill" style="width: 30%; background-color: var(--accent-orange)"></div></div>
+    </div>
+    
+    <div class="graph-canvas">
+      <!-- Architectural diagram representation instead of bubbles -->
+      <div class="entity-card root" style="top: 100px; left: 100px;">
+        <div class="card-header">owl:Thing</div>
+        <div class="card-body">Root Concept</div>
       </div>
+
+      <div class="entity-card child" style="top: 250px; left: 40px;">
+        <div class="card-header">geb:Entity</div>
+        <div class="card-body">Base Resource</div>
+      </div>
+
+      <div class="entity-card child" style="top: 250px; left: 240px;">
+        <div class="card-header">geb:Property</div>
+        <div class="card-body">Edge Definition</div>
+      </div>
+      
+      <!-- Orthogonal SVG lines for professional diagram feel -->
+      <svg class="graph-edges">
+        <path d="M 175 160 L 175 205 L 115 205 L 115 250" fill="none" stroke="var(--border-color-dark)" stroke-width="1.5" />
+        <path d="M 175 160 L 175 205 L 315 205 L 315 250" fill="none" stroke="var(--border-color-dark)" stroke-width="1.5" />
+      </svg>
     </div>
   </div>
 
-  <!-- Graph Panel -->
-  <div class="panel col-span-2 graph-panel">
-    <div class="panel-header">
-      <h3>Interactive Graph</h3>
-      <span class="material-icons-outlined">fullscreen</span>
+  <!-- Inspector Side Panel -->
+  <div class="panel col-span-1 inspector-panel">
+    <div class="panel-header border-bottom">
+      <h3 class="text-label">Inspector</h3>
     </div>
-    <div class="graph-placeholder">
-      <!-- Placeholder for Cytoscape/D3 -->
-      <div class="mock-node n1">Person</div>
-      <div class="mock-node n2">Organization</div>
-      <div class="mock-node n3" style="background-color: var(--accent-orange)">Location</div>
-      <svg class="mock-edges">
-        <line x1="150" y1="100" x2="350" y2="100" stroke="var(--text-secondary)" stroke-width="2"/>
-        <line x1="150" y1="100" x2="250" y2="250" stroke="var(--text-secondary)" stroke-width="2"/>
-      </svg>
+    
+    <div class="inspector-content">
+      <div class="property-group">
+        <label>Selected Node</label>
+        <div class="value code-font">geb:Entity</div>
+      </div>
+      
+      <div class="property-group">
+        <label>URI</label>
+        <div class="value link">http://geb.engine/onto#Entity</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h4 class="text-label mt-4">Axioms</h4>
+      <ul class="axiom-list">
+        <li><span class="keyword">rdfs:subClassOf</span> <span class="reference">owl:Thing</span></li>
+        <li><span class="keyword">owl:disjointWith</span> <span class="reference">geb:Property</span></li>
+      </ul>
+      
+      <div class="divider"></div>
+      
+      <h4 class="text-label mt-4">Data Properties</h4>
+      <div class="table-container">
+        <div class="table-row header">
+          <div>Property</div>
+          <div>Range</div>
+        </div>
+        <div class="table-row">
+          <div>hasName</div>
+          <div>xsd:string</div>
+        </div>
+        <div class="table-row">
+          <div>createdAt</div>
+          <div>xsd:dateTime</div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
