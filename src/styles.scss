@@ -1,29 +1,45 @@
-// Custom Theming for Angular Material
-// For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
+@import '@angular/material/prebuilt-themes/azure-blue.css';
 
-// Include the common styles for Angular Material.
-@include mat.core();
-
-// Define the theme object.
-$semantic-ontology-ui-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$deep-purple-palette,
-    tertiary: mat.$amber-palette,
-  ),
-  density: (
-    scale: 0,
-  )
-));
-
-// Include theme styles for core and each component used in your app.
+/* 
+ * Global Enterprise Light Theme Variables 
+ */
 :root {
-  @include mat.all-component-themes($semantic-ontology-ui-theme);
+  --bg-color: #f4f6f8; /* Crisp light gray background */
+  --surface-color: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --accent-blue: #0ea5e9;
+  --accent-orange: #f97316;
+  --border-color: #e2e8f0;
+  
+  --font-family: 'Inter', 'Roboto', sans-serif;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: #fafafa; }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+* {
+  box-sizing: border-box;
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}

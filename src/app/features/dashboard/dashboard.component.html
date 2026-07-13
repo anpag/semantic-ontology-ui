@@ -1,0 +1,43 @@
+<div class="dashboard-header">
+  <h1>Ontology Overview</h1>
+  <button class="btn-primary">New Ontology</button>
+</div>
+
+<div class="dashboard-grid">
+  <!-- Stats Panel -->
+  <div class="panel col-span-2">
+    <h3>My Ontologies</h3>
+    <div class="stats-list">
+      <div class="stat-item">
+        <span>Project Ontology</span>
+        <div class="progress-bar"><div class="fill" style="width: 70%"></div></div>
+      </div>
+      <div class="stat-item">
+        <span>Semantic Web Project</span>
+        <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+      </div>
+      <div class="stat-item">
+        <span>Organization</span>
+        <div class="progress-bar"><div class="fill" style="width: 30%; background-color: var(--accent-orange)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graph Panel -->
+  <div class="panel col-span-2 graph-panel">
+    <div class="panel-header">
+      <h3>Interactive Graph</h3>
+      <span class="material-icons-outlined">fullscreen</span>
+    </div>
+    <div class="graph-placeholder">
+      <!-- Placeholder for Cytoscape/D3 -->
+      <div class="mock-node n1">Person</div>
+      <div class="mock-node n2">Organization</div>
+      <div class="mock-node n3" style="background-color: var(--accent-orange)">Location</div>
+      <svg class="mock-edges">
+        <line x1="150" y1="100" x2="350" y2="100" stroke="var(--text-secondary)" stroke-width="2"/>
+        <line x1="150" y1="100" x2="250" y2="250" stroke="var(--text-secondary)" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+</div>

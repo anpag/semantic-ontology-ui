@@ -1,0 +1,130 @@
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 24px;
+    margin: 0;
+  }
+
+  .btn-primary {
+    background-color: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+.panel {
+  background-color: var(--surface-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .material-icons-outlined {
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+}
+
+.stats-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background-color: var(--bg-color);
+    border-radius: 3px;
+    overflow: hidden;
+
+    .fill {
+      height: 100%;
+      background-color: var(--accent-blue);
+      border-radius: 3px;
+    }
+  }
+}
+
+.graph-panel {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.graph-placeholder {
+  flex: 1;
+  position: relative;
+  background-color: #fafafa;
+  border-radius: 8px;
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px dashed var(--border-color);
+
+  .mock-node {
+    position: absolute;
+    padding: 12px 24px;
+    background-color: var(--accent-blue);
+    color: white;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: var(--shadow-md);
+    z-index: 2;
+
+    &.n1 { top: 80px; left: 100px; }
+    &.n2 { top: 80px; left: 300px; background-color: var(--text-primary); }
+    &.n3 { top: 230px; left: 200px; }
+  }
+
+  .mock-edges {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+}
