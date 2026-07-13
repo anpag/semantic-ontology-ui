@@ -26,7 +26,7 @@
     </div>
     
     <div class="graph-canvas">
-      <app-ontology-graph></app-ontology-graph>
+      <app-ontology-graph (nodeSelected)="onNodeSelected($event)"></app-ontology-graph>
     </div>
   </div>
 
@@ -36,43 +36,27 @@
       <h3 class="text-label">Inspector</h3>
     </div>
     
-    <div class="inspector-content">
+    <div class="inspector-content" *ngIf="selectedNode">
       <div class="property-group">
         <label>Selected Node</label>
-        <div class="value code-font">geb:Entity</div>
+        <div class="value code-font">{{ selectedNode.name }}</div>
       </div>
       
       <div class="property-group">
         <label>URI</label>
-        <div class="value link">http://geb.engine/onto#Entity</div>
+        <div class="value link">{{ selectedNode.uri || 'http://geb.engine/onto#' + selectedNode.id }}</div>
       </div>
 
       <div class="divider"></div>
 
-      <h4 class="text-label mt-4">Axioms</h4>
-      <ul class="axiom-list">
-        <li><span class="keyword">rdfs:subClassOf</span> <span class="reference">owl:Thing</span></li>
-        <li><span class="keyword">owl:disjointWith</span> <span class="reference">geb:Property</span></li>
-      </ul>
-      
-      <div class="divider"></div>
-      
-      <h4 class="text-label mt-4">Data Properties</h4>
-      <div class="table-container">
-        <div class="table-row header">
-          <div>Property</div>
-          <div>Range</div>
-        </div>
-        <div class="table-row">
-          <div>hasName</div>
-          <div>xsd:string</div>
-        </div>
-        <div class="table-row">
-          <div>createdAt</div>
-          <div>xsd:dateTime</div>
-        </div>
+      <h4 class="text-label mt-4">Type</h4>
+      <div class="property-group">
+        <div class="value">{{ selectedNode.type }}</div>
       </div>
-
+    </div>
+    
+    <div class="inspector-content empty-state" *ngIf="!selectedNode" style="display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-tertiary);">
+      <p>Select a node in the graph<br>to view its properties.</p>
     </div>
   </div>
 </div>

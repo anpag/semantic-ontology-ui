@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter, Input } from '@angular/core';
 import cytoscape from 'cytoscape';
 
 @Component({
@@ -9,6 +9,9 @@ import cytoscape from 'cytoscape';
 })
 export class OntologyGraphComponent implements AfterViewInit {
   @ViewChild('cy') cyElement!: ElementRef;
+  @Input() graphData: any[] = [];
+  @Output() nodeSelected = new EventEmitter<any>();
+  
   private cy: cytoscape.Core | undefined;
 
   ngAfterViewInit(): void {
@@ -18,11 +21,11 @@ export class OntologyGraphComponent implements AfterViewInit {
   private initGraph(): void {
     this.cy = cytoscape({
       container: this.cyElement.nativeElement,
-      elements: [
-        { data: { id: 'thing', name: 'owl:Thing', type: 'root' } },
-        { data: { id: 'person', name: 'geb:Person', type: 'class' } },
-        { data: { id: 'org', name: 'geb:Organization', type: 'class' } },
-        { data: { id: 'worksFor', name: 'worksFor', type: 'property' } },
+      elements: this.graphData.length > 0 ? this.graphData : [
+        { data: { id: 'thing', name: 'owl:Thing', type: 'root', uri: 'http://www.w3.org/2002/07/owl#Thing' } },
+        { data: { id: 'person', name: 'geb:Person', type: 'class', uri: 'http://geb.engine/onto#Person' } },
+        { data: { id: 'org', name: 'geb:Organization', type: 'class', uri: 'http://geb.engine/onto#Organization' } },
+        { data: { id: 'worksFor', name: 'worksFor', type: 'property', uri: 'http://geb.engine/onto#worksFor' } },
         { data: { source: 'person', target: 'thing', label: 'subClassOf' } },
         { data: { source: 'org', target: 'thing', label: 'subClassOf' } },
         { data: { source: 'person', target: 'worksFor', label: 'domain' } },
@@ -79,6 +82,19 @@ export class OntologyGraphComponent implements AfterViewInit {
         directed: true,
         padding: 50,
         spacingFactor: 1.5
+      }
+    });
+
+    // Handle node selection
+    this.cy.on('tap', 'node', (evt) => {
+      const nodeData = evt.target.data();
+      this.nodeSelected.emit(nodeData);
+    });
+    
+    // Deselect when clicking background
+    this.cy.on('tap', (evt) => {
+      if (evt.target === this.cy) {
+        this.nodeSelected.emit(null);
       }
     });
   }

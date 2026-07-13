@@ -10,5 +10,9 @@ import { OntologyGraphComponent } from '../ontology-graph/ontology-graph.compone
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+  selectedNode: any = null;
 
+  onNodeSelected(node: any) {
+    this.selectedNode = node;
+  }
 }
