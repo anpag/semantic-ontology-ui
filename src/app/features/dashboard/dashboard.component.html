@@ -4,7 +4,7 @@
     <h1>Architecture Graph</h1>
   </div>
   <div class="actions">
-    <button class="btn-secondary">Import TTL</button>
+    <button class="btn-secondary">Import Ontology</button>
     <button class="btn-primary">New Class</button>
   </div>
 </div>
@@ -15,7 +15,7 @@
     <div class="panel-header">
       <div class="tabs">
         <div class="tab active">Visual Editor</div>
-        <div class="tab">Turtle Source</div>
+        <div class="tab">RDF Source</div>
         <div class="tab">Inferences</div>
       </div>
       <div class="tools">
@@ -26,27 +26,7 @@
     </div>
     
     <div class="graph-canvas">
-      <!-- Architectural diagram representation instead of bubbles -->
-      <div class="entity-card root" style="top: 100px; left: 100px;">
-        <div class="card-header">owl:Thing</div>
-        <div class="card-body">Root Concept</div>
-      </div>
-
-      <div class="entity-card child" style="top: 250px; left: 40px;">
-        <div class="card-header">geb:Entity</div>
-        <div class="card-body">Base Resource</div>
-      </div>
-
-      <div class="entity-card child" style="top: 250px; left: 240px;">
-        <div class="card-header">geb:Property</div>
-        <div class="card-body">Edge Definition</div>
-      </div>
-      
-      <!-- Orthogonal SVG lines for professional diagram feel -->
-      <svg class="graph-edges">
-        <path d="M 175 160 L 175 205 L 115 205 L 115 250" fill="none" stroke="var(--border-color-dark)" stroke-width="1.5" />
-        <path d="M 175 160 L 175 205 L 315 205 L 315 250" fill="none" stroke="var(--border-color-dark)" stroke-width="1.5" />
-      </svg>
+      <app-ontology-graph></app-ontology-graph>
     </div>
   </div>
 
