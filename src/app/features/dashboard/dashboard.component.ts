@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { OntologyGraphComponent } from '../ontology-graph/ontology-graph.component';
 import { OntologyService } from '../../core/services/ontology.service';
 import { timer, of } from 'rxjs';
@@ -12,69 +13,83 @@ import { exhaustMap, takeWhile, catchError } from 'rxjs/operators';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   selectedNode: any = null;
   graphData: any[] = [];
+  displayMode: 'label' | 'uri' = 'label';
   isLoading = false;
   statusMessage = '';
   currentJobId = '';
 
-  constructor(private ontologyService: OntologyService) {}
+  constructor(
+    private ontologyService: OntologyService,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      const jobId = params.get('jobId');
+      if (jobId) {
+        this.loadOntologyFromRepo(jobId);
+      }
+    });
+  }
+
+  loadOntologyFromRepo(jobId: string) {
+    this.isLoading = true;
+    this.statusMessage = 'Loading from repository...';
+    this.pollGraphData(jobId);
+  }
+
+  toggleDisplayMode() {
+    this.displayMode = this.displayMode === 'label' ? 'uri' : 'label';
+  }
 
   onNodeSelected(node: any) {
     this.selectedNode = node;
   }
 
-  triggerFileInput() {
-    const fileInput = document.getElementById('ontology-file-input') as HTMLInputElement;
-    fileInput.click();
-  }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.isLoading = true;
-      this.statusMessage = 'Uploading ontology...';
-      const format = file.name.endsWith('.ttl') ? 'turtle' : 'xml';
-      
-      this.ontologyService.uploadOntology(file, format).subscribe({
-        next: (res) => {
-          this.statusMessage = 'Ingested. Executing GEB Rust reasoner...';
-          this.pollGraphData(res.job_id);
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.statusMessage = 'Upload failed. Check backend connection.';
-          console.error(err);
-        }
-      });
-    }
-  }
 
   private pollGraphData(jobId: string) {
-    // Poll the graph endpoint every 2 seconds until it resolves successfully
     let completed = false;
     this.currentJobId = jobId;
-    timer(0, 2000).pipe(
-      exhaustMap(() => this.ontologyService.getRoots(jobId).pipe(
-        catchError(() => {
-          // If backend returns 404 or fails, we keep polling
-          return of(null);
-        })
+    
+    // Poll the status endpoint every 500ms
+    timer(0, 500).pipe(
+      exhaustMap(() => this.ontologyService.getStatus(jobId).pipe(
+        catchError(() => of({ status: 'Connecting to server...' }))
       )),
-      takeWhile(res => res === null || !completed, true)
+      takeWhile(res => !completed)
     ).subscribe({
       next: (res) => {
-        if (res && res.elements) {
-          completed = true;
-          this.graphData = res.elements;
-          this.isLoading = false;
-          this.statusMessage = '';
+        this.statusMessage = res.status;
+        
+        if (res.status === 'Completed' || res.status.startsWith('Error')) {
+            completed = true;
+            if (res.status === 'Completed') {
+                // Now fetch the actual graph roots
+                this.statusMessage = 'Rendering graph...';
+                this.ontologyService.getRoots(jobId).subscribe({
+                    next: (rootRes) => {
+                        this.graphData = rootRes.elements || [];
+                        this.isLoading = false;
+                        this.statusMessage = '';
+                    },
+                    error: (err) => {
+                        this.isLoading = false;
+                        this.statusMessage = 'Error rendering graph.';
+                        console.error(err);
+                    }
+                });
+            } else {
+                this.isLoading = false;
+            }
         }
       },
       error: (err) => {
         this.isLoading = false;
-        this.statusMessage = 'Error during graph compilation.';
+        this.statusMessage = 'Polling error.';
         console.error(err);
       }
     });

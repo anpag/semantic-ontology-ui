@@ -4,8 +4,6 @@
     <h1>Architecture Graph</h1>
   </div>
   <div class="actions">
-    <input type="file" id="ontology-file-input" (change)="onFileSelected($event)" accept=".ttl,.owl,.xml" style="display: none;">
-    <button class="btn-secondary" (click)="triggerFileInput()">Import Ontology</button>
     <button class="btn-primary">New Class</button>
   </div>
 </div>
@@ -20,6 +18,7 @@
         <div class="tab">Inferences</div>
       </div>
       <div class="tools">
+        <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px; margin-right: 8px;" (click)="toggleDisplayMode()">Toggle Labels</button>
         <span class="material-icons-outlined">zoom_in</span>
         <span class="material-icons-outlined">zoom_out</span>
         <span class="material-icons-outlined">fit_screen</span>
@@ -31,7 +30,10 @@
         <span class="material-icons-outlined spin">sync</span>
         <p>{{ statusMessage }}</p>
       </div>
-      <app-ontology-graph [graphData]="graphData" (nodeSelected)="onNodeSelected($event)" (expandNodeRequest)="onExpandNodeRequest($event)"></app-ontology-graph>
+      
+
+      <!-- Graph View -->
+      <app-ontology-graph *ngIf="currentJobId" [displayMode]="displayMode" [graphData]="graphData" (nodeSelected)="onNodeSelected($event)" (expandNodeRequest)="onExpandNodeRequest($event)"></app-ontology-graph>
     </div>
   </div>
 
@@ -64,6 +66,8 @@
       <p>Select a node in the graph<br>to view its properties.</p>
     </div>
   </div>
+
+
 
   <!-- Semantic Agent Chat Panel -->
   <div class="panel col-span-1 agent-panel">

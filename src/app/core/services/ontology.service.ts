@@ -23,12 +23,25 @@ export class OntologyService {
   /**
    * Uploads an ontology file to the GEB engine for background reasoning.
    */
-  uploadOntology(file: File, format: string = 'turtle'): Observable<IngestResponse> {
+  uploadOntology(file: File, format: string = 'turtle', gcsBucket: string = '', bqDataset: string = ''): Observable<IngestResponse> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('format', format);
+    if (gcsBucket) formData.append('gcs_bucket', gcsBucket);
+    if (bqDataset) formData.append('bq_dataset', bqDataset);
 
     return this.http.post<IngestResponse>(`${this.apiUrl}/ingest`, formData);
+  }
+
+  getStatus(jobId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/status/${jobId}`);
+  }
+
+  /**
+   * Retrieves a list of available ontologies from the backend repository.
+   */
+  getOntologies(): Observable<{ontologies: any[]}> {
+    return this.http.get<{ontologies: any[]}>(`${this.apiUrl}/ontologies`);
   }
 
   /**
@@ -42,13 +55,13 @@ export class OntologyService {
    * Retrieves the expanded subgraph around a specific node.
    */
   expandNode(jobId: string, nodeUri: string): Observable<GraphResponse> {
-    return this.http.get<GraphResponse>(`${this.apiUrl}/graph/${jobId}/expand?uri=${encodeURIComponent(nodeUri)}`);
+    return this.http.get<GraphResponse>(`${this.apiUrl}/graph/${jobId}/expand?node_uri=${encodeURIComponent(nodeUri)}`);
   }
 
   /**
    * Retrieves the degree (number of connections) for a specific node.
    */
   getDegree(jobId: string, nodeUri: string): Observable<{ count: number }> {
-    return this.http.get<{ count: number }>(`${this.apiUrl}/graph/${jobId}/degree?uri=${encodeURIComponent(nodeUri)}`);
+    return this.http.get<{ count: number }>(`${this.apiUrl}/graph/${jobId}/degree?node_uri=${encodeURIComponent(nodeUri)}`);
   }
 }

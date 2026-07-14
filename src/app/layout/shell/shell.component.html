@@ -7,25 +7,34 @@
     </div>
 
     <nav class="nav-menu">
-      <div class="nav-item">
-        <span class="material-icons-outlined">dashboard</span>
-        <span>Dashboard</span>
+      <div class="nav-item" routerLink="/library" routerLinkActive="active">
+        <span class="material-icons-outlined">folder_open</span>
+        <span>Ontology Library</span>
       </div>
-      <div class="nav-item active">
-        <span class="material-icons-outlined">account_tree</span>
-        <span>Ontologies</span>
+
+      <!-- Contextual Navigation (Enabled only if an ontology is active) -->
+      <div class="context-divider" *ngIf="activeJobId"></div>
+      <div class="context-label" *ngIf="activeJobId">ACTIVE ONTOLOGY</div>
+      <div class="active-badge" *ngIf="activeJobId">
+        <span class="material-icons-outlined">cloud_done</span>
+        <span class="ontology-title" [title]="activeOntologyName">{{ activeOntologyName }}</span>
       </div>
-      <div class="nav-item">
+
+      <div class="nav-item" [routerLink]="['/ontology', activeJobId, 'visualizer']" routerLinkActive="active" *ngIf="activeJobId">
+        <span class="material-icons-outlined">bubble_chart</span>
+        <span>Visualizer</span>
+      </div>
+      <div class="nav-item" [routerLink]="['/ontology', activeJobId, 'classes']" routerLinkActive="active" *ngIf="activeJobId">
         <span class="material-icons-outlined">category</span>
         <span>Classes</span>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" [routerLink]="['/ontology', activeJobId, 'properties']" routerLinkActive="active" *ngIf="activeJobId">
         <span class="material-icons-outlined">list_alt</span>
         <span>Properties</span>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" [routerLink]="['/ontology', activeJobId, 'reasoner']" routerLinkActive="active" *ngIf="activeJobId">
         <span class="material-icons-outlined">psychology</span>
-        <span>Reasoner</span>
+        <span>Reasoner Insights</span>
       </div>
     </nav>
   </aside>
@@ -44,7 +53,7 @@
     </header>
 
     <div class="content-scroll">
-      <app-dashboard></app-dashboard>
+      <router-outlet></router-outlet>
     </div>
   </main>
 </div>

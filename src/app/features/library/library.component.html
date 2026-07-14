@@ -1,0 +1,60 @@
+<div class="library-container">
+  <div class="library-header">
+    <div class="title-group">
+      <h1>Ontology Library</h1>
+      <p class="subtitle">Manage, import, and materialize ontologies into Google Cloud</p>
+    </div>
+  </div>
+
+  <div class="library-content">
+    <div class="panel upload-panel">
+      <div class="panel-header">
+        <h2>Import New Ontology</h2>
+      </div>
+      <div class="upload-form">
+        <div class="form-group">
+          <label>Ontology File (.ttl, .owl, .xml)</label>
+          <input type="file" id="ontology-file-input" (change)="onFileSelected($event)" accept=".ttl,.owl,.xml">
+        </div>
+        
+        <div class="form-group">
+          <label>Google Cloud Storage Bucket (Raw Storage)</label>
+          <input type="text" [(ngModel)]="gcsBucket" placeholder="e.g. gs://semantic-ontologies-raw">
+        </div>
+
+        <div class="form-group">
+          <label>BigQuery Dataset (Materialized Graph)</label>
+          <input type="text" [(ngModel)]="bqDataset" placeholder="e.g. semantic_platform.materialized_graphs">
+        </div>
+
+        <button class="btn-primary upload-btn" [disabled]="!selectedFile || isUploading" (click)="uploadOntology()">
+          <span class="material-icons-outlined spin" *ngIf="isUploading">sync</span>
+          {{ isUploading ? 'Uploading & Materializing...' : 'Upload & Materialize' }}
+        </button>
+        <div class="status-msg" *ngIf="uploadStatus">{{ uploadStatus }}</div>
+      </div>
+    </div>
+
+    <div class="panel repo-panel">
+      <div class="panel-header">
+        <h2>Available Ontologies</h2>
+      </div>
+      <div class="repo-grid">
+        <div class="repo-card" *ngFor="let repo of availableOntologies" (click)="openOntology(repo.job_id)">
+          <div class="repo-icon-wrapper">
+            <span class="material-icons-outlined repo-icon">account_tree</span>
+          </div>
+          <div class="repo-info">
+            <h4>{{ repo.name }}</h4>
+            <span class="repo-meta">{{ repo.size_mb }} MB • {{ repo.created_at }}</span>
+          </div>
+          <span class="material-icons-outlined chevron">chevron_right</span>
+        </div>
+        
+        <div class="repo-card empty" *ngIf="availableOntologies.length === 0">
+          <p>No cached ontologies found in BigQuery.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

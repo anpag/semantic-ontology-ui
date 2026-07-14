@@ -84,6 +84,45 @@
       font-size: 18px;
     }
   }
+
+  .context-divider {
+    height: 1px;
+    background-color: var(--border-color-dark);
+    margin: 12px 12px;
+  }
+
+  .context-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    letter-spacing: 0.08em;
+    padding: 0 24px 6px;
+  }
+
+  .active-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 12px 12px;
+    padding: 8px 12px;
+    background-color: rgba(26, 115, 232, 0.05);
+    border-radius: 6px;
+    border: 1px dashed rgba(26, 115, 232, 0.3);
+    color: var(--primary-color);
+    
+    .material-icons-outlined {
+      font-size: 16px;
+    }
+
+    .ontology-title {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+  }
 }
 
 /* Main Content Styles */

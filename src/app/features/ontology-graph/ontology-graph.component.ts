@@ -10,6 +10,7 @@ import cytoscape from 'cytoscape';
 export class OntologyGraphComponent implements AfterViewInit, OnChanges {
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() graphData: any[] = [];
+  @Input() displayMode: 'label' | 'uri' = 'label';
   @Output() nodeSelected = new EventEmitter<any>();
   @Output() expandNodeRequest = new EventEmitter<string>();
   
@@ -49,14 +50,19 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
               padding: 50,
               spacingFactor: 1.5,
               animate: true,
-              fit: false,
-              randomize: false
+              fit: false
             }).run();
           }
         } else {
           this.cy!.elements().remove();
         }
       });
+    }
+
+    if (changes['displayMode'] && this.cy) {
+      this.cy.style().selector('node').style({
+        'content': this.displayMode === 'label' ? 'data(name)' : 'data(id)'
+      }).update();
     }
   }
 
@@ -77,7 +83,7 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
         {
           selector: 'node',
           style: {
-            'label': 'data(name)',
+            'label': this.displayMode === 'label' ? 'data(name)' : 'data(id)',
             'shape': 'round-rectangle',
             'background-color': '#ffffff',
             'border-color': '#e5e7eb',
@@ -135,6 +141,14 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
 
     // Handle expand request (right-click / context tap)
     this.cy.on('cxttap', 'node', (evt) => {
+      const nodeData = evt.target.data();
+      if (nodeData.uri) {
+        this.expandNodeRequest.emit(nodeData.uri);
+      }
+    });
+
+    // Handle expand request (double click)
+    this.cy.on('dblclick', 'node', (evt) => {
       const nodeData = evt.target.data();
       if (nodeData.uri) {
         this.expandNodeRequest.emit(nodeData.uri);
