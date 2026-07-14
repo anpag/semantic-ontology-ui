@@ -11,6 +11,7 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() graphData: any[] = [];
   @Output() nodeSelected = new EventEmitter<any>();
+  @Output() expandNodeRequest = new EventEmitter<string>();
   
   private cy: cytoscape.Core | undefined;
 
@@ -21,15 +22,39 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['graphData'] && this.cy) {
       this.cy.batch(() => {
-        this.cy!.elements().remove();
         if (this.graphData && this.graphData.length > 0) {
-          this.cy!.add(this.graphData);
-          this.cy!.layout({
-            name: 'breadthfirst',
-            directed: true,
-            padding: 50,
-            spacingFactor: 1.5
-          }).run();
+          const newDataIds = new Set();
+          this.graphData.forEach(ele => {
+            if (ele.data.source && ele.data.target && !ele.data.id) {
+              ele.data.id = `${ele.data.source}-${ele.data.target}-${ele.data.label}`;
+            }
+            newDataIds.add(ele.data.id);
+          });
+
+          // Remove elements not in new graphData
+          this.cy!.elements().forEach(ele => {
+            if (!newDataIds.has(ele.id())) {
+              this.cy!.remove(ele);
+            }
+          });
+
+          const existingIds = new Set(this.cy!.elements().map(ele => ele.id()));
+          const newEles = this.graphData.filter(ele => !existingIds.has(ele.data.id));
+
+          if (newEles.length > 0) {
+            this.cy!.add(newEles);
+            this.cy!.layout({
+              name: 'breadthfirst',
+              directed: true,
+              padding: 50,
+              spacingFactor: 1.5,
+              animate: true,
+              fit: false,
+              randomize: false
+            }).run();
+          }
+        } else {
+          this.cy!.elements().remove();
         }
       });
     }
@@ -106,6 +131,14 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
     this.cy.on('tap', 'node', (evt) => {
       const nodeData = evt.target.data();
       this.nodeSelected.emit(nodeData);
+    });
+
+    // Handle expand request (right-click / context tap)
+    this.cy.on('cxttap', 'node', (evt) => {
+      const nodeData = evt.target.data();
+      if (nodeData.uri) {
+        this.expandNodeRequest.emit(nodeData.uri);
+      }
     });
     
     // Deselect when clicking background

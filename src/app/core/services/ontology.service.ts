@@ -32,9 +32,23 @@ export class OntologyService {
   }
 
   /**
-   * Retrieves the Cytoscape-formatted graph data for a specific job.
+   * Retrieves the root nodes for a specific job.
    */
-  getGraph(jobId: string): Observable<GraphResponse> {
-    return this.http.get<GraphResponse>(`${this.apiUrl}/graph/${jobId}`);
+  getRoots(jobId: string): Observable<GraphResponse> {
+    return this.http.get<GraphResponse>(`${this.apiUrl}/graph/${jobId}/roots`);
+  }
+
+  /**
+   * Retrieves the expanded subgraph around a specific node.
+   */
+  expandNode(jobId: string, nodeUri: string): Observable<GraphResponse> {
+    return this.http.get<GraphResponse>(`${this.apiUrl}/graph/${jobId}/expand?uri=${encodeURIComponent(nodeUri)}`);
+  }
+
+  /**
+   * Retrieves the degree (number of connections) for a specific node.
+   */
+  getDegree(jobId: string, nodeUri: string): Observable<{ count: number }> {
+    return this.http.get<{ count: number }>(`${this.apiUrl}/graph/${jobId}/degree?uri=${encodeURIComponent(nodeUri)}`);
   }
 }

@@ -31,7 +31,7 @@
         <span class="material-icons-outlined spin">sync</span>
         <p>{{ statusMessage }}</p>
       </div>
-      <app-ontology-graph [graphData]="graphData" (nodeSelected)="onNodeSelected($event)"></app-ontology-graph>
+      <app-ontology-graph [graphData]="graphData" (nodeSelected)="onNodeSelected($event)" (expandNodeRequest)="onExpandNodeRequest($event)"></app-ontology-graph>
     </div>
   </div>
 
@@ -62,6 +62,38 @@
     
     <div class="inspector-content empty-state" *ngIf="!selectedNode" style="display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-tertiary);">
       <p>Select a node in the graph<br>to view its properties.</p>
+    </div>
+  </div>
+
+  <!-- Semantic Agent Chat Panel -->
+  <div class="panel col-span-1 agent-panel">
+    <div class="panel-header border-bottom">
+      <div class="tabs">
+        <div class="tab active">
+          <span class="material-icons-outlined" style="margin-right: 6px; font-size: 16px;">smart_toy</span>
+          Semantic Agent
+        </div>
+      </div>
+    </div>
+    
+    <div class="agent-content">
+      <div class="chat-messages">
+        <div class="message agent">
+          <div class="avatar"><span class="material-icons-outlined">smart_toy</span></div>
+          <div class="bubble">Hello! I'm your Semantic Agent. How can I help you analyze this ontology?</div>
+        </div>
+        <div class="message user">
+          <div class="bubble">What are the subclasses of geb:Person?</div>
+        </div>
+        <div class="message agent">
+          <div class="avatar"><span class="material-icons-outlined">smart_toy</span></div>
+          <div class="bubble">I found 3 subclasses. Expanding them on the graph now.</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" placeholder="Ask the agent...">
+        <button class="send-btn"><span class="material-icons-outlined">send</span></button>
+      </div>
     </div>
   </div>
 </div>

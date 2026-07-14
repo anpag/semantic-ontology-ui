@@ -56,7 +56,7 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 24px;
   height: calc(100vh - 200px); /* Fill remaining height */
 }
@@ -280,6 +280,120 @@
         background-color: var(--sidebar-bg);
         font-weight: 600;
         color: var(--text-secondary);
+      }
+    }
+  }
+}
+
+/* Semantic Agent Panel */
+.agent-panel {
+  display: flex;
+  flex-direction: column;
+
+  .agent-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .message {
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.4;
+
+    &.user {
+      flex-direction: row-reverse;
+      .bubble {
+        background-color: var(--accent-primary);
+        color: white;
+        border-radius: 8px 8px 0 8px;
+      }
+    }
+
+    &.agent {
+      .bubble {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-color-dark);
+        color: var(--text-primary);
+        border-radius: 8px 8px 8px 0;
+      }
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      .material-icons-outlined {
+        font-size: 16px;
+        color: var(--accent-primary);
+      }
+    }
+
+    .bubble {
+      padding: 10px 14px;
+      max-width: 85%;
+      box-shadow: var(--shadow-subtle);
+    }
+  }
+
+  .chat-input-area {
+    padding: 16px;
+    border-top: 1px solid var(--border-color-dark);
+    display: flex;
+    gap: 8px;
+    background-color: var(--sidebar-bg);
+
+    input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color-dark);
+      background-color: var(--surface-color);
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+
+      &:focus {
+        border-color: var(--accent-primary);
+      }
+    }
+
+    .send-btn {
+      background-color: var(--accent-primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #1d4ed8;
+      }
+
+      .material-icons-outlined {
+        font-size: 16px;
       }
     }
   }

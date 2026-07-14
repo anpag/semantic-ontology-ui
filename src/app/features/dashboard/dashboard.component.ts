@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { OntologyGraphComponent } from '../ontology-graph/ontology-graph.component';
 import { OntologyService } from '../../core/services/ontology.service';
 import { timer, of } from 'rxjs';
-import { switchMap, takeWhile, catchError } from 'rxjs/operators';
+import { exhaustMap, takeWhile, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +17,7 @@ export class DashboardComponent {
   graphData: any[] = [];
   isLoading = false;
   statusMessage = '';
+  currentJobId = '';
 
   constructor(private ontologyService: OntologyService) {}
 
@@ -53,8 +54,9 @@ export class DashboardComponent {
   private pollGraphData(jobId: string) {
     // Poll the graph endpoint every 2 seconds until it resolves successfully
     let completed = false;
+    this.currentJobId = jobId;
     timer(0, 2000).pipe(
-      switchMap(() => this.ontologyService.getGraph(jobId).pipe(
+      exhaustMap(() => this.ontologyService.getRoots(jobId).pipe(
         catchError(() => {
           // If backend returns 404 or fails, we keep polling
           return of(null);
@@ -73,6 +75,47 @@ export class DashboardComponent {
       error: (err) => {
         this.isLoading = false;
         this.statusMessage = 'Error during graph compilation.';
+        console.error(err);
+      }
+    });
+  }
+
+  onExpandNodeRequest(nodeUri: string) {
+    if (!this.currentJobId) return;
+
+    this.isLoading = true;
+    this.statusMessage = 'Fetching node degree...';
+
+    this.ontologyService.getDegree(this.currentJobId, nodeUri).subscribe({
+      next: (res) => {
+        if (res.count > 50) {
+          const proceed = confirm(`This node has ${res.count} connections. Expanding it might clutter the graph. Do you want to proceed?`);
+          if (!proceed) {
+            this.isLoading = false;
+            this.statusMessage = '';
+            return;
+          }
+        }
+        
+        this.statusMessage = 'Expanding node...';
+        this.ontologyService.expandNode(this.currentJobId, nodeUri).subscribe({
+          next: (expandRes) => {
+            if (expandRes && expandRes.elements) {
+              this.graphData = [...this.graphData, ...expandRes.elements];
+            }
+            this.isLoading = false;
+            this.statusMessage = '';
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.statusMessage = 'Error expanding node.';
+            console.error(err);
+          }
+        });
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.statusMessage = 'Error fetching node degree.';
         console.error(err);
       }
     });
