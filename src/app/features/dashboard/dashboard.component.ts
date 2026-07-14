@@ -15,11 +15,20 @@ import { exhaustMap, takeWhile, catchError } from 'rxjs/operators';
 })
 export class DashboardComponent implements OnInit {
   selectedNode: any = null;
+  selectedNodeDetails: any = null;
   graphData: any[] = [];
   displayMode: 'label' | 'uri' = 'label';
   isLoading = false;
   statusMessage = '';
   currentJobId = '';
+  selectedNodeId: string | null = null;
+
+  // Tab State
+  activeTab: 'visual' | 'rdf' | 'inferences' = 'visual';
+  rdfSource = '';
+  rdfSourceTruncated = false;
+  inferredTriples: any[] = [];
+  isTabLoading = false;
 
   constructor(
     private ontologyService: OntologyService,
@@ -30,7 +39,12 @@ export class DashboardComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const jobId = params.get('jobId');
       if (jobId) {
+        this.currentJobId = jobId;
         this.loadOntologyFromRepo(jobId);
+        // Reset tab data when switching ontologies
+        this.rdfSource = '';
+        this.inferredTriples = [];
+        this.activeTab = 'visual';
       }
     });
   }
@@ -47,6 +61,84 @@ export class DashboardComponent implements OnInit {
 
   onNodeSelected(node: any) {
     this.selectedNode = node;
+    this.selectedNodeDetails = null;
+    if (this.currentJobId && node && node.uri) {
+      this.ontologyService.getNodeDetails(this.currentJobId, node.uri).subscribe({
+        next: (res) => {
+          this.selectedNodeDetails = res.properties;
+        },
+        error: (err) => console.error("Error fetching node details", err)
+      });
+    }
+  }
+
+  getPropertyKeys(): string[] {
+    if (!this.selectedNodeDetails) return [];
+    const keys = Object.keys(this.selectedNodeDetails);
+    const priority = ['prefLabel', 'altLabel', 'definition', 'comment', 'type'];
+    return keys.sort((a, b) => {
+      const idxA = priority.indexOf(a);
+      const idxB = priority.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+  }
+
+  isAbsoluteUri(uri: string): boolean {
+    return !!(uri && (uri.startsWith('http://') || uri.startsWith('https://')));
+  }
+
+  switchTab(tab: 'visual' | 'rdf' | 'inferences') {
+    this.activeTab = tab;
+    if (!this.currentJobId) return;
+
+    if (tab === 'rdf' && !this.rdfSource) {
+      this.isTabLoading = true;
+      this.ontologyService.getGraphSource(this.currentJobId).subscribe({
+        next: (res) => {
+          this.rdfSource = res.source;
+          this.rdfSourceTruncated = res.truncated;
+          this.isTabLoading = false;
+        },
+        error: (err) => {
+          console.error(err);
+          this.isTabLoading = false;
+        }
+      });
+    } else if (tab === 'inferences' && this.inferredTriples.length === 0) {
+      this.isTabLoading = true;
+      this.ontologyService.getInferences(this.currentJobId).subscribe({
+        next: (res) => {
+          this.inferredTriples = res.inferences;
+          this.isTabLoading = false;
+        },
+        error: (err) => {
+          console.error(err);
+          this.isTabLoading = false;
+        }
+      });
+    }
+  }
+
+  selectInferenceSubject(subjectUri: string) {
+    const shortName = subjectUri.split('#').pop() || subjectUri.split('/').pop() || subjectUri;
+    this.onNodeSelected({ id: subjectUri, name: shortName, uri: subjectUri, type: 'class' });
+  }
+
+  revealNodeInVisualizer(subjectUri: string, event: Event) {
+    event.stopPropagation();
+    const shortName = subjectUri.split('#').pop() || subjectUri.split('/').pop() || subjectUri;
+    
+    const exists = this.graphData.some(ele => ele.data.id === subjectUri);
+    if (!exists) {
+      this.graphData = [...this.graphData, { data: { id: subjectUri, name: shortName, uri: subjectUri, type: 'class' } }];
+    }
+    
+    this.activeTab = 'visual';
+    this.selectedNodeId = subjectUri;
+    this.onNodeSelected({ id: subjectUri, name: shortName, uri: subjectUri, type: 'class' });
   }
 
 

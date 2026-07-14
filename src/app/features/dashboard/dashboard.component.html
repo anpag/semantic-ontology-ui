@@ -11,30 +11,70 @@
 <div class="dashboard-grid">
   <!-- Interactive Graph Area (Main Focus) -->
   <div class="panel col-span-3 graph-panel">
-    <div class="panel-header">
-      <div class="tabs">
-        <div class="tab active">Visual Editor</div>
-        <div class="tab">RDF Source</div>
-        <div class="tab">Inferences</div>
-      </div>
-      <div class="tools">
-        <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px; margin-right: 8px;" (click)="toggleDisplayMode()">Toggle Labels</button>
-        <span class="material-icons-outlined">zoom_in</span>
-        <span class="material-icons-outlined">zoom_out</span>
-        <span class="material-icons-outlined">fit_screen</span>
-      </div>
-    </div>
-    
-    <div class="graph-canvas">
-      <div class="loading-overlay" *ngIf="isLoading">
-        <span class="material-icons-outlined spin">sync</span>
-        <p>{{ statusMessage }}</p>
-      </div>
-      
+     <div class="panel-header">
+       <div class="tabs">
+         <div class="tab" [class.active]="activeTab === 'visual'" (click)="switchTab('visual')">Visual Editor</div>
+         <div class="tab" [class.active]="activeTab === 'rdf'" (click)="switchTab('rdf')">RDF Source</div>
+         <div class="tab" [class.active]="activeTab === 'inferences'" (click)="switchTab('inferences')">Inferences</div>
+       </div>
+       <div class="tools" *ngIf="activeTab === 'visual'">
+         <button class="btn-secondary toggle-label-btn" [class.active]="displayMode === 'uri'" (click)="toggleDisplayMode()">
+           {{ displayMode === 'label' ? 'Show URIs' : 'Show Labels' }}
+         </button>
+         <span class="material-icons-outlined">zoom_in</span>
+         <span class="material-icons-outlined">zoom_out</span>
+         <span class="material-icons-outlined">fit_screen</span>
+       </div>
+     </div>
+     
+     <div class="graph-canvas">
+       <div class="loading-overlay" *ngIf="isLoading || isTabLoading">
+         <span class="material-icons-outlined spin">sync</span>
+         <p>{{ isLoading ? statusMessage : 'Fetching data...' }}</p>
+       </div>
+       
+       <!-- Graph View -->
+       <app-ontology-graph *ngIf="currentJobId && activeTab === 'visual'" [displayMode]="displayMode" [graphData]="graphData" [selectedNodeId]="selectedNodeId" (nodeSelected)="onNodeSelected($event)" (expandNodeRequest)="onExpandNodeRequest($event)"></app-ontology-graph>
 
-      <!-- Graph View -->
-      <app-ontology-graph *ngIf="currentJobId" [displayMode]="displayMode" [graphData]="graphData" (nodeSelected)="onNodeSelected($event)" (expandNodeRequest)="onExpandNodeRequest($event)"></app-ontology-graph>
-    </div>
+       <!-- RDF Source View -->
+       <div class="rdf-source-container" *ngIf="activeTab === 'rdf' && !isTabLoading">
+         <pre class="code-editor">{{ rdfSource }}</pre>
+         <div class="truncated-warning" *ngIf="rdfSourceTruncated">
+           Showing the first 1,000 lines of materialized RDF. Download the full graph to inspect the complete set.
+         </div>
+       </div>
+
+       <!-- Inferences View -->
+       <div class="inferences-container" *ngIf="activeTab === 'inferences' && !isTabLoading">
+         <div class="table-scroll">
+           <table class="inferences-table">
+             <thead>
+               <tr>
+                 <th>Subject</th>
+                 <th>Predicate</th>
+                 <th>Object</th>
+                 <th style="width: 60px; text-align: center;">Reveal</th>
+               </tr>
+             </thead>
+             <tbody>
+               <tr *ngFor="let triple of inferredTriples" (click)="selectInferenceSubject(triple.subject)" class="clickable-row">
+                 <td [title]="triple.subject">{{ triple.subject.split('#').pop() || triple.subject }}</td>
+                 <td class="code-font">{{ triple.predicate }}</td>
+                 <td [title]="triple.object">{{ triple.object.split('#').pop() || triple.object }}</td>
+                 <td style="text-align: center;">
+                   <button class="btn-icon-reveal" (click)="revealNodeInVisualizer(triple.subject, $event)" title="Reveal in Visualizer">
+                     <span class="material-icons-outlined">center_focus_strong</span>
+                   </button>
+                 </td>
+               </tr>
+               <tr class="empty" *ngIf="inferredTriples.length === 0">
+                 <td colspan="3">No inferences generated for this graph.</td>
+               </tr>
+             </tbody>
+           </table>
+         </div>
+       </div>
+     </div>
   </div>
 
   <!-- Inspector Side Panel -->
@@ -51,14 +91,26 @@
       
       <div class="property-group">
         <label>URI</label>
-        <div class="value link">{{ selectedNode.uri || 'http://geb.engine/onto#' + selectedNode.id }}</div>
+        <div class="value" [class.link]="isAbsoluteUri(selectedNode.uri)">
+          <span *ngIf="isAbsoluteUri(selectedNode.uri)">{{ selectedNode.uri }}</span>
+          <span *ngIf="!isAbsoluteUri(selectedNode.uri)">{{ selectedNode.uri || 'http://geb.engine/onto#' + selectedNode.id }}</span>
+        </div>
       </div>
 
       <div class="divider"></div>
 
-      <h4 class="text-label mt-4">Type</h4>
-      <div class="property-group">
-        <div class="value">{{ selectedNode.type }}</div>
+      <!-- Rich Properties Section -->
+      <div class="rich-properties" *ngIf="selectedNodeDetails">
+        <div class="property-group" *ngFor="let prop of getPropertyKeys()">
+          <label>{{ prop }}</label>
+          <div class="value text-block" *ngFor="let val of selectedNodeDetails[prop]">
+            {{ val }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="loading-inline" *ngIf="!selectedNodeDetails && selectedNode.uri">
+        <span class="material-icons-outlined spin">sync</span> Loading annotations...
       </div>
     </div>
     

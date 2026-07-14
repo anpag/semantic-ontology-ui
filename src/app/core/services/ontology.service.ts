@@ -64,4 +64,25 @@ export class OntologyService {
   getDegree(jobId: string, nodeUri: string): Observable<{ count: number }> {
     return this.http.get<{ count: number }>(`${this.apiUrl}/graph/${jobId}/degree?node_uri=${encodeURIComponent(nodeUri)}`);
   }
+
+  /**
+   * Retrieves all properties and annotations for a specific node.
+   */
+  getNodeDetails(jobId: string, nodeUri: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/graph/${jobId}/node?node_uri=${encodeURIComponent(nodeUri)}`);
+  }
+
+  /**
+   * Retrieves the raw materialized N-Triples source.
+   */
+  getGraphSource(jobId: string): Observable<{ source: string, truncated: boolean }> {
+    return this.http.get<{ source: string, truncated: boolean }>(`${this.apiUrl}/graph/${jobId}/source`);
+  }
+
+  /**
+   * Retrieves the inferred triples.
+   */
+  getInferences(jobId: string): Observable<{ inferences: any[] }> {
+    return this.http.get<{ inferences: any[] }>(`${this.apiUrl}/graph/${jobId}/inferences`);
+  }
 }

@@ -11,6 +11,7 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() graphData: any[] = [];
   @Input() displayMode: 'label' | 'uri' = 'label';
+  @Input() selectedNodeId: string | null = null;
   @Output() nodeSelected = new EventEmitter<any>();
   @Output() expandNodeRequest = new EventEmitter<string>();
   
@@ -63,6 +64,24 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
       this.cy.style().selector('node').style({
         'content': this.displayMode === 'label' ? 'data(name)' : 'data(id)'
       }).update();
+    }
+
+    if (changes['selectedNodeId'] && this.cy) {
+      const id = this.selectedNodeId;
+      if (id) {
+        // Wait a small delay to make sure elements are fully added before trying to select
+        setTimeout(() => {
+          const ele = this.cy!.getElementById(id);
+          if (ele.length > 0) {
+            this.cy!.$('node').unselect();
+            ele.select();
+            this.cy!.animate({
+              center: { eles: ele },
+              zoom: 1.2
+            }, { duration: 400 });
+          }
+        }, 100);
+      }
     }
   }
 
