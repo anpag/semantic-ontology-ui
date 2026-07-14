@@ -134,21 +134,26 @@
     
     <div class="agent-content">
       <div class="chat-messages">
-        <div class="message agent">
-          <div class="avatar"><span class="material-icons-outlined">smart_toy</span></div>
-          <div class="bubble">Hello! I'm your Semantic Agent. How can I help you analyze this ontology?</div>
+        <div class="message" *ngFor="let msg of chatHistory" [class.user]="msg.role === 'user'" [class.agent]="msg.role === 'model'">
+          <div class="avatar" *ngIf="msg.role === 'model'">
+            <span class="material-icons-outlined">smart_toy</span>
+          </div>
+          <div class="bubble">{{ msg.text }}</div>
         </div>
-        <div class="message user">
-          <div class="bubble">What are the subclasses of geb:Person?</div>
-        </div>
-        <div class="message agent">
-          <div class="avatar"><span class="material-icons-outlined">smart_toy</span></div>
-          <div class="bubble">I found 3 subclasses. Expanding them on the graph now.</div>
+        
+        <div class="message agent" *ngIf="isAgentTyping">
+          <div class="avatar">
+            <span class="material-icons-outlined spin">sync</span>
+          </div>
+          <div class="bubble typing">Analyzing ontology context...</div>
         </div>
       </div>
+      
       <div class="chat-input-area">
-        <input type="text" placeholder="Ask the agent...">
-        <button class="send-btn"><span class="material-icons-outlined">send</span></button>
+        <input type="text" [(ngModel)]="chatInputMessage" (keyup.enter)="sendMessageToAgent()" placeholder="Ask the agent...">
+        <button class="send-btn" [disabled]="isAgentTyping" (click)="sendMessageToAgent()">
+          <span class="material-icons-outlined">send</span>
+        </button>
       </div>
     </div>
   </div>

@@ -85,4 +85,11 @@ export class OntologyService {
   getInferences(jobId: string): Observable<{ inferences: any[] }> {
     return this.http.get<{ inferences: any[] }>(`${this.apiUrl}/graph/${jobId}/inferences`);
   }
+
+  /**
+   * Sends a message to the Semantic Agent.
+   */
+  sendChatMessage(jobId: string, message: string, history: any[]): Observable<{ response: string, action: any }> {
+    return this.http.post<{ response: string, action: any }>(`${this.apiUrl}/graph/${jobId}/chat`, { message, history });
+  }
 }

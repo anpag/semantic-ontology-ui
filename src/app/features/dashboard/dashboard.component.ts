@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { OntologyGraphComponent } from '../ontology-graph/ontology-graph.component';
 import { OntologyService } from '../../core/services/ontology.service';
 import { timer, of } from 'rxjs';
@@ -9,7 +10,7 @@ import { exhaustMap, takeWhile, catchError } from 'rxjs/operators';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, OntologyGraphComponent],
+  imports: [CommonModule, FormsModule, OntologyGraphComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -29,6 +30,13 @@ export class DashboardComponent implements OnInit {
   rdfSourceTruncated = false;
   inferredTriples: any[] = [];
   isTabLoading = false;
+
+  // Agent State
+  chatInputMessage = '';
+  chatHistory: any[] = [
+    { role: 'model', text: "Hello! I'm your Semantic Agent. I am connected to this ontology and can help you navigate or query it. Try asking me: 'Show subclasses of WorkPiece' or 'What properties are there?'." }
+  ];
+  isAgentTyping = false;
 
   constructor(
     private ontologyService: OntologyService,
@@ -139,6 +147,43 @@ export class DashboardComponent implements OnInit {
     this.activeTab = 'visual';
     this.selectedNodeId = subjectUri;
     this.onNodeSelected({ id: subjectUri, name: shortName, uri: subjectUri, type: 'class' });
+  }
+
+  sendMessageToAgent() {
+    if (!this.chatInputMessage.trim() || !this.currentJobId || this.isAgentTyping) return;
+
+    const userText = this.chatInputMessage;
+    this.chatInputMessage = '';
+    
+    // Add user message
+    this.chatHistory.push({ role: 'user', text: userText });
+    this.isAgentTyping = true;
+
+    // Send to backend Gemini agent
+    // Map history to backend-friendly format: role: user|model, text: string
+    const historyPayload = this.chatHistory.slice(0, -1).map(h => ({ role: h.role, text: h.text }));
+
+    this.ontologyService.sendChatMessage(this.currentJobId, userText, historyPayload).subscribe({
+      next: (res) => {
+        this.isAgentTyping = false;
+        this.chatHistory.push({ role: 'model', text: res.response });
+
+        // Execute structural action if returned
+        if (res.action && res.action.type && res.action.uri) {
+          console.log("[Semantic Agent Action Triggered]", res.action);
+          if (res.action.type === 'reveal') {
+            this.revealNodeInVisualizer(res.action.uri, new Event('agent-trigger'));
+          } else if (res.action.type === 'expand') {
+            this.onExpandNodeRequest(res.action.uri);
+          }
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.isAgentTyping = false;
+        this.chatHistory.push({ role: 'model', text: "Sorry, I had trouble contacting my backend reasoning module." });
+      }
+    });
   }
 
 
