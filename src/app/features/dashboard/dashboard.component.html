@@ -4,7 +4,8 @@
     <h1>Architecture Graph</h1>
   </div>
   <div class="actions">
-    <button class="btn-secondary">Import Ontology</button>
+    <input type="file" id="ontology-file-input" (change)="onFileSelected($event)" accept=".ttl,.owl,.xml" style="display: none;">
+    <button class="btn-secondary" (click)="triggerFileInput()">Import Ontology</button>
     <button class="btn-primary">New Class</button>
   </div>
 </div>
@@ -26,7 +27,11 @@
     </div>
     
     <div class="graph-canvas">
-      <app-ontology-graph (nodeSelected)="onNodeSelected($event)"></app-ontology-graph>
+      <div class="loading-overlay" *ngIf="isLoading">
+        <span class="material-icons-outlined spin">sync</span>
+        <p>{{ statusMessage }}</p>
+      </div>
+      <app-ontology-graph [graphData]="graphData" (nodeSelected)="onNodeSelected($event)"></app-ontology-graph>
     </div>
   </div>
 

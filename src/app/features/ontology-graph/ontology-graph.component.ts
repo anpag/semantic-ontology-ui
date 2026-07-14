@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import cytoscape from 'cytoscape';
 
 @Component({
@@ -7,7 +7,7 @@ import cytoscape from 'cytoscape';
   templateUrl: './ontology-graph.component.html',
   styleUrl: './ontology-graph.component.scss'
 })
-export class OntologyGraphComponent implements AfterViewInit {
+export class OntologyGraphComponent implements AfterViewInit, OnChanges {
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() graphData: any[] = [];
   @Output() nodeSelected = new EventEmitter<any>();
@@ -16,6 +16,23 @@ export class OntologyGraphComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initGraph();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['graphData'] && this.cy) {
+      this.cy.batch(() => {
+        this.cy!.elements().remove();
+        if (this.graphData && this.graphData.length > 0) {
+          this.cy!.add(this.graphData);
+          this.cy!.layout({
+            name: 'breadthfirst',
+            directed: true,
+            padding: 50,
+            spacingFactor: 1.5
+          }).run();
+        }
+      });
+    }
   }
 
   private initGraph(): void {
