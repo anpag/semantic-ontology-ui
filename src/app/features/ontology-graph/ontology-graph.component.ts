@@ -126,6 +126,19 @@ export class OntologyGraphComponent implements AfterViewInit, OnChanges {
           }
         },
         {
+          selector: 'node[type="restriction"]',
+          style: {
+            'shape': 'ellipse',
+            'background-color': '#eff6ff',
+            'border-color': '#3b82f6',
+            'border-style': 'dashed',
+            'border-width': 1.5,
+            'color': '#1d4ed8',
+            'font-style': 'italic',
+            'font-size': '10px'
+          }
+        },
+        {
           selector: 'edge',
           style: {
             'width': 1.5,
